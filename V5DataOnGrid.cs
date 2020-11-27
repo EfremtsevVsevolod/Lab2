@@ -1,12 +1,13 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Numerics;
 using System.Text;
 
 
-namespace Lab1
+namespace Lab2
 {
-    class V5DataOnGrid : V5Data
+    class V5DataOnGrid : V5Data, IEnumerable
     {
         public Grid2D Grid { get; set; }
         public Vector2[,] ValuesGrid { get; set; } = {};
@@ -16,6 +17,7 @@ namespace Lab1
         {
             Grid = grid;
         }
+
         public V5DataOnGrid(string filename)
             : base("", new DateTime())
         {
@@ -73,6 +75,8 @@ namespace Lab1
                 {
                     Console.WriteLine("Unexpected error");
                 }
+
+                throw exception;
             }
         }
 
@@ -158,6 +162,11 @@ namespace Lab1
                 }
             }
             return strBulder.ToString();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
         }
 
         public override IEnumerator<DataItem> GetEnumerator()

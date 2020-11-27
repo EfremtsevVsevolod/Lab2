@@ -1,11 +1,13 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
 using System.Text;
 
-namespace Lab1
+namespace Lab2
 {
-    class V5DataCollection : V5Data
+    class V5DataCollection : V5Data, IEnumerable
     {
         public Dictionary<Vector2, Vector2> ValuesDct { get; set; } =
             new Dictionary<Vector2, Vector2>();
@@ -13,6 +15,16 @@ namespace Lab1
         public V5DataCollection(string serviceInfo, DateTime measurementTime) :
             base(serviceInfo, measurementTime)
         { }
+
+        public V5DataCollection(V5DataOnGrid v5DataOnGridInstance) :
+            base(v5DataOnGridInstance.ServiceInfo, v5DataOnGridInstance.MeasurementTime)
+        {
+            var iterV5DataOnGrid = from lstElem in v5DataOnGridInstance
+                                   select new KeyValuePair<Vector2, Vector2>
+                                   (lstElem.PointCoord, lstElem.FieldValue);
+
+            ValuesDct = new Dictionary<Vector2, Vector2>(iterV5DataOnGrid);
+        }
 
         public void InitRandom(int nItems, float xmax, float ymax, float minValue, float maxValue)
         {
@@ -69,6 +81,11 @@ namespace Lab1
             }
 
             return strBulder.ToString();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
         }
 
         public override IEnumerator<DataItem> GetEnumerator()

@@ -5,7 +5,7 @@ using System.Linq;
 using System.Numerics;
 using System.Text;
 
-namespace Lab1
+namespace Lab2
 {
     class V5MainCollection : IEnumerable
     {
@@ -25,28 +25,48 @@ namespace Lab1
             Count -= removedCount;
             return removedCount > 0;
         }
+        
+        void AddOneDefaultGrid(Grid2D grid)
+        {
+            V5DataOnGrid v5DataOnGridDefaultInstance =
+                    new V5DataOnGrid("Default service info", new DateTime(1970, 1, 1), grid);
+            v5DataOnGridDefaultInstance.InitRandom(-100.0f, 100.0f);
+            LstData.Add(v5DataOnGridDefaultInstance);
+        }
+
+        void AddOneDefaultColection(int nItems)
+        {
+            V5DataCollection v5DataCollectionDefaultInstance =
+                new V5DataCollection("Default service info", new DateTime(1970, 1, 1));
+            v5DataCollectionDefaultInstance.InitRandom(nItems, 10.0f, 10.0f, -100.0f, 100.0f);
+            LstData.Add(v5DataCollectionDefaultInstance);
+        }
+
+        void AddPairDefaultGridAndCollection(Grid2D grid)
+        {
+            V5DataOnGrid v5DataOnGridDefaultInstance =
+                    new V5DataOnGrid("Default info", new DateTime(1970, 1, 1), grid);
+            v5DataOnGridDefaultInstance.InitRandom(-100.0f, 100.0f);
+            LstData.Add(v5DataOnGridDefaultInstance);
+            LstData.Add((V5DataCollection)v5DataOnGridDefaultInstance);
+        }
 
         public void AddDefaults()
         {
-            Grid2D grid = new Grid2D(3, 3, 1.0f, 1.0f);
+            Grid2D smallGrid = new Grid2D(1, 1, 1.0f, 1.0f);
+            Grid2D bigGrid = new Grid2D(2, 2, 1.0f, 1.0f);
+            Grid2D emptyGrid = new Grid2D(0, 0, 1.0f, 1.0f);
 
-            for (int i = 0; i < 3; ++i)
-            {
-                V5DataOnGrid v5DataOnGridDefaultInstance =
-                    new V5DataOnGrid("Default V5DataOnGrid service info",
-                                     new DateTime(1970, 1, 1), grid);
-                v5DataOnGridDefaultInstance.InitRandom(-100.0f, 100.0f);
-                LstData.Add(v5DataOnGridDefaultInstance);
-            }
+            // Different nonempty
+            AddOneDefaultColection(3);
+            AddOneDefaultGrid(bigGrid);
 
-            for (int i = 0; i < 3; ++i)
-            {
-                V5DataCollection v5DataCollectionDefaultInstance =
-                    new V5DataCollection("Default V5MainCollection service info",
-                                         new DateTime(1970, 1, 1));
-                v5DataCollectionDefaultInstance.InitRandom(5, 10.0f, 10.0f, -100.0f, 100.0f);
-                LstData.Add(v5DataCollectionDefaultInstance);
-            }
+            // The same nonempty
+            AddPairDefaultGridAndCollection(smallGrid);
+
+            // Empty
+            AddOneDefaultColection(0);
+            AddOneDefaultGrid(emptyGrid);
         }
 
         public override string ToString()
@@ -61,7 +81,7 @@ namespace Lab1
             return strBulder.ToString();
         }
 
-        string ToLongString(string format)
+        public string ToLongString(string format)
         {
             StringBuilder strBulder = new StringBuilder();
 
@@ -73,14 +93,14 @@ namespace Lab1
             return strBulder.ToString();
         }
 
-        public IEnumerator<V5Data> GetEnumerator()
-        {
-            return ((IEnumerable<V5Data>)LstData).GetEnumerator();
-        }
-
         IEnumerator IEnumerable.GetEnumerator()
         {
             return ((IEnumerable)LstData).GetEnumerator();
+        }
+
+        public IEnumerator<V5Data> GetEnumerator()
+        {
+            return ((IEnumerable<V5Data>)LstData).GetEnumerator();
         }
 
         public float Min
@@ -88,9 +108,9 @@ namespace Lab1
             get
             {
                 return (from lstElem in LstData
-                       where lstElem.GetType() == typeof(V5DataCollection)
-                       from KeyValuePair<Vector2, Vector2> kvp in ((V5DataCollection)lstElem).ValuesDct
-                       select kvp.Value.Length()).Min();
+                        where lstElem.GetType() == typeof(V5DataCollection)
+                        from dataItem in lstElem
+                        select dataItem.FieldValue.Length()).Min();
             }
         }
 
@@ -100,8 +120,27 @@ namespace Lab1
             {
                 float minLengh = Min;
                 return from lstElem in LstData
-                       from elem in lstElem
+                       from dataItem in lstElem
+                       where dataItem.FieldValue.Length() == minLengh
+                       select dataItem;
+            }
+        }
 
+        public IEnumerable<Vector2> IterVector2Target
+        {
+            get
+            {
+                var iterV5DataOnGrid = from lstElem in LstData
+                                       where lstElem.GetType() == typeof(V5DataOnGrid)
+                                       from dataItem in lstElem
+                                       select dataItem.PointCoord;
+
+                var iterV5DataCollection = from lstElem in LstData 
+                                           where lstElem.GetType() == typeof(V5DataCollection)
+                                           from dataItem in lstElem
+                                           select dataItem.PointCoord;
+
+                return iterV5DataOnGrid.Except(iterV5DataCollection).Distinct();
             }
         }
     }
