@@ -10,7 +10,8 @@ namespace Lab2
             try
             {
                 Console.WriteLine("-----1-----");
-                string project_path = @"C:\Users\sevak\source\repos\Lab2\";
+                Directory.SetCurrentDirectory("..\\..\\..");
+                string project_path = Directory.GetCurrentDirectory();
                 string full_path = Path.Combine(project_path, "input.txt");
 
                 V5DataOnGrid v5DataOnGridInstance = new V5DataOnGrid(full_path);

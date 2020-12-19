@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Numerics;
 using System.Text;
 
@@ -43,8 +44,11 @@ namespace Lab2
                     string[] first_str = sr.ReadLine().Split(' ');
                     string[] second_str = sr.ReadLine().Split(' ');
 
+                    CultureInfo ru_culture_info = new CultureInfo("ru-RU");
+
                     Grid = new Grid2D(int.Parse(first_str[0]), int.Parse(first_str[1]),
-                        float.Parse(second_str[0]), float.Parse(second_str[1]));
+                        float.Parse(second_str[0], ru_culture_info),
+                        float.Parse(second_str[1], ru_culture_info));
 
                     ValuesGrid = new Vector2[Grid.NodesNumberX, Grid.NodesNumberY];
                     for (int i = 0; i < Grid.NodesNumberX; ++i)
@@ -53,8 +57,9 @@ namespace Lab2
 
                         for (int j = 0; j < Grid.NodesNumberY; ++j)
                         {
-                            ValuesGrid[i, j] = new Vector2(float.Parse(read_str[2 * j]),
-                                float.Parse(read_str[2 * j + 1]));
+                            ValuesGrid[i, j] = new Vector2(
+                                float.Parse(read_str[2 * j], ru_culture_info),
+                                float.Parse(read_str[2 * j + 1], ru_culture_info));
                         }
                     }
                 }
